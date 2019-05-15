@@ -1,0 +1,36 @@
+{
+  "name": "sisyphus-drawer",
+  "version": "0.0.1",
+  "description": "Sisyphus table pattern creator",
+  "author": "Jered Danielson <jered@uw.edu>",
+  "license": "MIT",
+  "scripts": {
+    "start": "node server.js",
+    "build": "rm -rf dist && parcel build src/index.html",
+    "dev": "parcel src/index.html"
+  },
+  "dependencies": {
+    "express": "^4.16.4",
+    "pixi.js": "^5.0.2",
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6",
+    "reset-css": "^4.0.1"
+  },
+  "engines": {
+    "node": "8.x"
+  },
+  "keywords": [
+    "node",
+    "glitch",
+    "express",
+    "parcel",
+    "react"
+  ],
+  "devDependencies": {
+    "@babel/core": "^7.2.0",
+    "@babel/preset-env": "^7.2.0",
+    "@babel/preset-react": "^7.0.0",
+    "parcel-bundler": "^1.12.3",
+    "babel-plugin-transform-class-properties": "^6.24.1"
+  }
+}
