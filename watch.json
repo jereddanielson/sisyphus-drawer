@@ -8,12 +8,12 @@
   },
   "restart": {
     "exclude": [
-      "^public/",
+      "^dist/",
       "^src/"
     ],
     "include": [
-      "\\.js$",
-      "\\.json"
+      "\\.tsx?$",
+      "\\.json$"
     ]
   },
   "throttle": 1000

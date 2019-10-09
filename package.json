@@ -1,36 +1,51 @@
 {
   "name": "sisyphus-drawer",
-  "version": "0.0.1",
-  "description": "Sisyphus table pattern creator",
-  "author": "Jered Danielson <jered@uw.edu>",
-  "license": "MIT",
+  "version": "0.0.5",
+  "description": "A webapp for creating Sisyphus table patterns",
   "scripts": {
-    "start": "node server.js",
-    "build": "rm -rf dist && parcel build src/index.html",
-    "dev": "parcel src/index.html"
+    "start": "npm run build && node server.js",
+    "start:dev": "parcel serve src/**/*.html --port 8080",
+    "start:clean": "npm run clean && npm start:dev",
+    "build": "npm run clean && parcel build src/**/*.html --no-source-maps --public-url .",
+    "clean": "rm -rf dist && rm -rf .cache",
+    "lint": "eslint './src/**/*.{js,jsx,ts,tsx}'",
+    "lint:fix": "eslint './src/**/*.{js,jsx,ts,tsx}' --fix",
+    "tsc": "npx tsc --noEmit"
   },
-  "dependencies": {
-    "express": "^4.16.4",
-    "pixi.js": "^5.0.2",
-    "react": "^16.8.6",
-    "react-dom": "^16.8.6",
-    "reset-css": "^4.0.1"
+  "author": {
+    "name": "Jered Danielson",
+    "email": "jered@uw.edu"
   },
-  "engines": {
-    "node": "8.x"
-  },
-  "keywords": [
-    "node",
-    "glitch",
-    "express",
-    "parcel",
-    "react"
+  "license": "MIT",
+  "browserslist": [
+    "> 1%",
+    "ie >= 11"
   ],
+  "dependencies": {
+    "react": "^16.10.2",
+    "react-dom": "^16.10.2"
+  },
+  "devEngines": {
+    "node": "8.x || 9.x || 10.x"
+  },
   "devDependencies": {
-    "@babel/core": "^7.2.0",
-    "@babel/preset-env": "^7.2.0",
-    "@babel/preset-react": "^7.0.0",
-    "parcel-bundler": "^1.12.3",
-    "babel-plugin-transform-class-properties": "^6.24.1"
+    "@babel/core": "^7.6.3",
+    "@babel/preset-env": "^7.6.3",
+    "@babel/preset-react": "^7.6.3",
+    "@types/react": "^16.9.5",
+    "@types/react-dom": "^16.9.1",
+    "@typescript-eslint/eslint-plugin": "^2.3.3",
+    "@typescript-eslint/parser": "^2.3.3",
+    "eslint": "^6.5.1",
+    "eslint-config-prettier": "^6.4.0",
+    "eslint-plugin-prettier": "^3.1.1",
+    "eslint-plugin-react": "^7.16.0",
+    "parcel-bundler": "^1.12.4",
+    "prettier": "^1.18.2",
+    "sass": "^1.23.0",
+    "typescript": "^3.6.3"
+  },
+  "alias": {
+    "Components": "./src/js/components"
   }
 }
