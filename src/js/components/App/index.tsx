@@ -3,12 +3,13 @@ import "./index.scss";
 import CanvasRenderer from "Components/CanvasRenderer";
 
 const Block: React.FC<{ block: S.Block }> = ({ block }) => {
+  const pathRef = React.useRef<SVGPathElement>(null);
   const c = block.curve;
   const path = `M ${c.p1.x} ${c.p1.y} C ${c.p2.x} ${c.p2.y}, ${c.p3.x} ${c.p3.y}, ${c.p4.x} ${c.p4.y}`;
 
   return (
     <>
-      <path stroke={"black"} fill={"transparent"} d={path} />
+      <path ref={pathRef} stroke={"black"} fill={"transparent"} d={path} />
       <circle
         onClick={e => {
           console.log(e, e.target);
@@ -29,37 +30,157 @@ const App: React.FC = () => {
       id: 0,
       index: 0,
       curve: {
-        p1: { x: 10, y: 10 },
-        p2: { x: 20, y: 20 },
-        p3: { x: 40, y: 20 },
-        p4: { x: 50, y: 10 }
-      }
-    },
-    {
-      id: 1,
-      index: 1,
-      curve: {
-        p1: { x: 25, y: 10 },
-        p2: { x: 50, y: 20 },
-        p3: { x: 70, y: 20 },
-        p4: { x: 50, y: 10 }
+        p1: { x: 10, y: 100 },
+        p2: { x: 20, y: 80 },
+        p3: { x: 40, y: 80 },
+        p4: { x: 50, y: 60 }
       }
     }
   ]);
 
+  const pathRef = React.useRef<SVGPathElement>(null);
+  let path = "";
+  blocks.forEach(ea => {
+    const c = ea.curve;
+    path += `M ${c.p1.x} ${c.p1.y} C ${c.p2.x} ${c.p2.y}, ${c.p3.x} ${c.p3.y}, ${c.p4.x} ${c.p4.y}`;
+  });
+
+  const startGrabHandle = React.useCallback(
+    (
+      blockIndex: number,
+      pointField: string,
+      mouseDownEvent: React.MouseEvent<SVGElement, MouseEvent>
+    ) => {
+      const initialMousePos: S.Point2D = {
+        x: mouseDownEvent.clientX,
+        y: mouseDownEvent.clientY
+      };
+
+      const onMouseMove = (mouseMoveEvent: MouseEvent) => {
+        setBlocks(oldBlocks => {
+          const update = [...oldBlocks];
+          const c = update[blockIndex].curve;
+          c[pointField].x += (mouseMoveEvent.clientX - initialMousePos.x) / 2;
+          c[pointField].y += (mouseMoveEvent.clientY - initialMousePos.y) / 2;
+          initialMousePos.x = mouseMoveEvent.clientX;
+          initialMousePos.y = mouseMoveEvent.clientY;
+          return update;
+        });
+      };
+
+      const onMouseUp = () => {
+        window.removeEventListener("mousemove", onMouseMove);
+        window.removeEventListener("mouseup", onMouseUp);
+      };
+
+      window.addEventListener("mousemove", onMouseMove);
+      window.addEventListener("mouseup", onMouseUp);
+    },
+    []
+  );
+
   return (
     <div className="app">
-      <CanvasRenderer blocks={blocks} />
+      <CanvasRenderer pathRef={pathRef} blocks={blocks} />
       <div id="timeline">
         <svg
-          width={200}
+          width={800}
           height={200}
-          viewBox="0 0 100 100"
+          viewBox="0 0 400 100"
           xmlns="http://www.w3.org/2000/svg"
         >
-          {blocks.map(eaBlock => {
+          <defs>
+            <pattern
+              id="pattern-checkers"
+              x="0"
+              y="0"
+              width="20"
+              height="20"
+              patternUnits="userSpaceOnUse"
+            >
+              <rect
+                fill="rgba(0, 0, 0, .1)"
+                x="0"
+                width="10"
+                height="10"
+                y="0"
+              />
+              <rect
+                fill="rgba(0, 0, 0, .1)"
+                x="10"
+                width="10"
+                height="10"
+                y="10"
+              />
+            </pattern>
+          </defs>
+          <rect width="400" height="100" fill="url(#pattern-checkers)" />
+          {/* {blocks.map(eaBlock => {
             return <Block key={eaBlock.id} block={eaBlock} />;
-          })}
+          })} */}
+
+          <path ref={pathRef} stroke={"black"} fill={"transparent"} d={path} />
+          <g>
+            {blocks.map((eaBlock, i) => {
+              const c = eaBlock.curve;
+              return (
+                <React.Fragment key={i}>
+                  <path
+                    stroke={"purple"}
+                    fill={"transparent"}
+                    d={`M${c.p1.x},${c.p1.y}L${c.p2.x},${c.p2.y}`}
+                  />
+                  <circle
+                    stroke={"transparent"}
+                    fill={"blue"}
+                    cx={c.p1.x}
+                    cy={c.p1.y}
+                    r={"2"}
+                    onMouseDown={e => {
+                      startGrabHandle(i, "p1", e);
+                    }}
+                  />
+                  <rect
+                    stroke={"transparent"}
+                    fill={"red"}
+                    x={c.p2.x - 2}
+                    y={c.p2.y - 2}
+                    width={"4"}
+                    height={"4"}
+                    onMouseDown={e => {
+                      startGrabHandle(i, "p2", e);
+                    }}
+                  />
+                  <path
+                    stroke={"purple"}
+                    fill={"transparent"}
+                    d={`M${c.p3.x},${c.p3.y}L${c.p4.x},${c.p4.y}`}
+                  />
+                  <rect
+                    stroke={"transparent"}
+                    fill={"red"}
+                    x={c.p3.x - 2}
+                    y={c.p3.y - 2}
+                    width={"4"}
+                    height={"4"}
+                    onMouseDown={e => {
+                      startGrabHandle(i, "p3", e);
+                    }}
+                  />
+                  <circle
+                    stroke={"transparent"}
+                    fill={"blue"}
+                    cx={c.p4.x}
+                    cy={c.p4.y}
+                    r={"2"}
+                    onMouseDown={e => {
+                      startGrabHandle(i, "p4", e);
+                    }}
+                  />
+                </React.Fragment>
+              );
+            })}
+          </g>
         </svg>
       </div>
     </div>
