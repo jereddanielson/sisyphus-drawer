@@ -3,8 +3,8 @@ import "./index.scss";
 
 const polarize = (pt: S.Point2D) => {
   return {
-    x: (100 - pt.y) * Math.cos(pt.x / 10) + 100,
-    y: (100 - pt.y) * Math.sin(pt.x / 10) + 100
+    x: (100 - pt.y) * Math.cos((pt.x / 20) * Math.PI * 2) + 100,
+    y: (100 - pt.y) * Math.sin((pt.x / 20) * Math.PI * 2) + 100
   };
 };
 
