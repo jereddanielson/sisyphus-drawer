@@ -45,6 +45,27 @@ const App: React.FC = () => {
     path += `M ${c.p1.x} ${c.p1.y} C ${c.p2.x} ${c.p2.y}, ${c.p3.x} ${c.p3.y}, ${c.p4.x} ${c.p4.y}`;
   });
 
+  // X U
+  // path = "m0,0 l";
+  // const iters = 900;
+  // for (let i = iters; i > 0; i--) {
+  //   path = `${path} 10,10 -10,0 11,-10`;
+  // }
+
+  //
+  // path = 'm0,0 l';
+  // const iters = 50;
+  // for (let i = iters; i > 0; i--) {
+  //   path = `${path} 10,10 -10,0 11,-10`;
+  // }
+
+  //
+  path = "M0,0 ";
+  const iters = 300;
+  for (let i = iters; i > 0; i--) {
+    path += `l2,8 a2,2,0,1,0,-.1,-.2 l4,8 l4,-8 a2,2,0,1,0,-.1,.2 l4,-8`;
+  }
+
   const startGrabHandle = React.useCallback(
     (
       blockIndex: number,
@@ -81,7 +102,15 @@ const App: React.FC = () => {
 
   return (
     <div className="app">
-      <CanvasRenderer pathRef={pathRef} blocks={blocks} />
+      <CanvasRenderer
+        pathRef={pathRef}
+        blocks={blocks}
+        // yScale={0.999}
+        yStep={-0.2}
+        xStep={0.15}
+        yStepInc={40}
+        xStepInc={40}
+      />
       <div id="timeline">
         <svg
           width={800}
