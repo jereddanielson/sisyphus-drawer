@@ -52,18 +52,25 @@ const App: React.FC = () => {
   //   path = `${path} 10,10 -10,0 11,-10`;
   // }
 
-  //
+  // xring2
   // path = 'm0,0 l';
   // const iters = 50;
   // for (let i = iters; i > 0; i--) {
   //   path = `${path} 10,10 -10,0 11,-10`;
   // }
 
+  // tricirc
+  // path = "M0,0 ";
+  // const iters = 33;
+  // for (let i = iters; i > 0; i--) {
+  //   path += `l2,8 a2,2,0,1,0,-.1,-.2 l4,8 l4,-8 a2,2,0,1,0,-.1,.2 l4,-8 l-8,0 a2,2,0,1,0,.1,0 l-7,0 l15,0`;
+  // }
+
   //
   path = "M0,0 ";
-  const iters = 300;
+  const iters = 10;
   for (let i = iters; i > 0; i--) {
-    path += `l2,8 a2,2,0,1,0,-.1,-.2 l4,8 l4,-8 a2,2,0,1,0,-.1,.2 l4,-8`;
+    path += `c 2,0 4,4 4,8 a 1,1 0,1,1 -1,-1 c 3,-1 2,-5 -0.5,-7`;
   }
 
   const startGrabHandle = React.useCallback(
@@ -104,12 +111,13 @@ const App: React.FC = () => {
     <div className="app">
       <CanvasRenderer
         pathRef={pathRef}
+        path={path}
         blocks={blocks}
         // yScale={0.999}
-        yStep={-0.2}
-        xStep={0.15}
-        yStepInc={40}
-        xStepInc={40}
+        yStep={-0.48}
+        xStep={0.45}
+        yStepInc={100}
+        xStepInc={100}
       />
       <div id="timeline">
         <svg
