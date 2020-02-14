@@ -9,7 +9,7 @@ module.exports = {
     browser: true,
     es6: true,
   },
-  plugins: [],
+  plugins: ["react-hooks"],
   extends: [
     "eslint:recommended",
     "plugin:react/recommended",
@@ -24,5 +24,7 @@ module.exports = {
   rules: {
     "react/prop-types": "off",
     "@typescript-eslint/explicit-function-return-type": "off",
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "warn"
   },
 };

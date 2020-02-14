@@ -1,6 +1,7 @@
 import * as React from "react";
 import "./index.scss";
 import CanvasRenderer from "Components/CanvasRenderer";
+import { Fiddle } from "Components/Fiddle";
 
 const Block: React.FC<{ block: S.Block }> = ({ block }) => {
   const pathRef = React.useRef<SVGPathElement>(null);
@@ -25,25 +26,10 @@ const Block: React.FC<{ block: S.Block }> = ({ block }) => {
 };
 
 const App: React.FC = () => {
-  const [blocks, setBlocks] = React.useState<S.Block[]>([
-    {
-      id: 0,
-      index: 0,
-      curve: {
-        p1: { x: 10, y: 100 },
-        p2: { x: 20, y: 80 },
-        p3: { x: 40, y: 80 },
-        p4: { x: 50, y: 60 }
-      }
-    }
-  ]);
+  const [iters, setIters] = React.useState(1);
+  const [coarseness, setCoarseness] = React.useState(1);
 
-  const pathRef = React.useRef<SVGPathElement>(null);
   let path = "";
-  blocks.forEach(ea => {
-    const c = ea.curve;
-    path += `M ${c.p1.x} ${c.p1.y} C ${c.p2.x} ${c.p2.y}, ${c.p3.x} ${c.p3.y}, ${c.p4.x} ${c.p4.y}`;
-  });
 
   // X U
   // path = "m0,0 l";
@@ -68,56 +54,24 @@ const App: React.FC = () => {
 
   //
   path = "M0,0 ";
-  const iters = 10;
   for (let i = iters; i > 0; i--) {
     path += `c 2,0 4,4 4,8 a 1,1 0,1,1 -1,-1 c 3,-1 2,-5 -0.5,-7`;
   }
 
-  const startGrabHandle = React.useCallback(
-    (
-      blockIndex: number,
-      pointField: string,
-      mouseDownEvent: React.MouseEvent<SVGElement, MouseEvent>
-    ) => {
-      const initialMousePos: S.Point2D = {
-        x: mouseDownEvent.clientX,
-        y: mouseDownEvent.clientY
-      };
-
-      const onMouseMove = (mouseMoveEvent: MouseEvent) => {
-        setBlocks(oldBlocks => {
-          const update = [...oldBlocks];
-          const c = update[blockIndex].curve;
-          c[pointField].x += (mouseMoveEvent.clientX - initialMousePos.x) / 2;
-          c[pointField].y += (mouseMoveEvent.clientY - initialMousePos.y) / 2;
-          initialMousePos.x = mouseMoveEvent.clientX;
-          initialMousePos.y = mouseMoveEvent.clientY;
-          return update;
-        });
-      };
-
-      const onMouseUp = () => {
-        window.removeEventListener("mousemove", onMouseMove);
-        window.removeEventListener("mouseup", onMouseUp);
-      };
-
-      window.addEventListener("mousemove", onMouseMove);
-      window.addEventListener("mouseup", onMouseUp);
-    },
-    []
-  );
-
   return (
     <div className="app">
       <CanvasRenderer
-        pathRef={pathRef}
         path={path}
-        blocks={blocks}
         // yScale={0.999}
-        yStep={-0.48}
-        xStep={0.45}
-        yStepInc={100}
-        xStepInc={100}
+        // yStep={-0.48}
+        // xStep={0.45}
+        // yStepInc={100}
+        // xStepInc={100}
+        yStep={0}
+        xStep={0}
+        yStepInc={0}
+        xStepInc={0}
+        stepWidth={coarseness}
       />
       <div id="timeline">
         <svg
@@ -152,73 +106,25 @@ const App: React.FC = () => {
             </pattern>
           </defs>
           <rect width="400" height="100" fill="url(#pattern-checkers)" />
-          {/* {blocks.map(eaBlock => {
-            return <Block key={eaBlock.id} block={eaBlock} />;
-          })} */}
-
-          <path ref={pathRef} stroke={"black"} fill={"transparent"} d={path} />
-          <g>
-            {blocks.map((eaBlock, i) => {
-              const c = eaBlock.curve;
-              return (
-                <React.Fragment key={i}>
-                  <path
-                    stroke={"purple"}
-                    fill={"transparent"}
-                    d={`M${c.p1.x},${c.p1.y}L${c.p2.x},${c.p2.y}`}
-                  />
-                  <circle
-                    stroke={"transparent"}
-                    fill={"blue"}
-                    cx={c.p1.x}
-                    cy={c.p1.y}
-                    r={"2"}
-                    onMouseDown={e => {
-                      startGrabHandle(i, "p1", e);
-                    }}
-                  />
-                  <rect
-                    stroke={"transparent"}
-                    fill={"red"}
-                    x={c.p2.x - 2}
-                    y={c.p2.y - 2}
-                    width={"4"}
-                    height={"4"}
-                    onMouseDown={e => {
-                      startGrabHandle(i, "p2", e);
-                    }}
-                  />
-                  <path
-                    stroke={"purple"}
-                    fill={"transparent"}
-                    d={`M${c.p3.x},${c.p3.y}L${c.p4.x},${c.p4.y}`}
-                  />
-                  <rect
-                    stroke={"transparent"}
-                    fill={"red"}
-                    x={c.p3.x - 2}
-                    y={c.p3.y - 2}
-                    width={"4"}
-                    height={"4"}
-                    onMouseDown={e => {
-                      startGrabHandle(i, "p3", e);
-                    }}
-                  />
-                  <circle
-                    stroke={"transparent"}
-                    fill={"blue"}
-                    cx={c.p4.x}
-                    cy={c.p4.y}
-                    r={"2"}
-                    onMouseDown={e => {
-                      startGrabHandle(i, "p4", e);
-                    }}
-                  />
-                </React.Fragment>
-              );
-            })}
-          </g>
+          <path stroke={"black"} fill={"transparent"} d={path} />
         </svg>
+        <div>
+          <Fiddle
+            label={"Iters"}
+            type={"number"}
+            value={iters}
+            updater={setIters}
+            min={0}
+          />
+          <Fiddle
+            label={"Coarseness"}
+            type={"number"}
+            value={coarseness}
+            updater={setCoarseness}
+            step={0.1}
+            min={0.1}
+          />
+        </div>
       </div>
     </div>
   );
