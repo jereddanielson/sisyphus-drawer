@@ -1,7 +1,9 @@
 import * as React from "react";
 import "./index.scss";
-import CanvasRenderer from "Components/CanvasRenderer";
+import { CanvasRenderer } from "Components/CanvasRenderer";
+import { Timeline } from "Components/Timeline";
 import { Fiddle } from "Components/Fiddle";
+import { PathChunkEditor } from "Components/PathChunkEditor";
 
 const Block: React.FC<{ block: S.Block }> = ({ block }) => {
   const pathRef = React.useRef<SVGPathElement>(null);
@@ -28,6 +30,9 @@ const Block: React.FC<{ block: S.Block }> = ({ block }) => {
 const App: React.FC = () => {
   const [iters, setIters] = React.useState(1);
   const [coarseness, setCoarseness] = React.useState(1);
+  const [pathChunk, setPathChunk] = React.useState(
+    "c 2,0 4,4 4,8 a 1,1 0,1,1 -1,-1 c 3,-1 2,-5 -0.5,-7"
+  );
 
   let path = "";
 
@@ -55,59 +60,29 @@ const App: React.FC = () => {
   //
   path = "M0,0 ";
   for (let i = iters; i > 0; i--) {
-    path += `c 2,0 4,4 4,8 a 1,1 0,1,1 -1,-1 c 3,-1 2,-5 -0.5,-7`;
+    path += pathChunk;
   }
 
   return (
-    <div className="app">
-      <CanvasRenderer
-        path={path}
-        // yScale={0.999}
-        // yStep={-0.48}
-        // xStep={0.45}
-        // yStepInc={100}
-        // xStepInc={100}
-        yStep={0}
-        xStep={0}
-        yStepInc={0}
-        xStepInc={0}
-        stepWidth={coarseness}
-      />
-      <div id="timeline">
-        <svg
-          width={800}
-          height={200}
-          viewBox="0 0 400 100"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <defs>
-            <pattern
-              id="pattern-checkers"
-              x="0"
-              y="0"
-              width="20"
-              height="20"
-              patternUnits="userSpaceOnUse"
-            >
-              <rect
-                fill="rgba(0, 0, 0, .1)"
-                x="0"
-                width="10"
-                height="10"
-                y="0"
-              />
-              <rect
-                fill="rgba(0, 0, 0, .1)"
-                x="10"
-                width="10"
-                height="10"
-                y="10"
-              />
-            </pattern>
-          </defs>
-          <rect width="400" height="100" fill="url(#pattern-checkers)" />
-          <path stroke={"black"} fill={"transparent"} d={path} />
-        </svg>
+    <>
+      <div id="left"></div>
+      <div id="mid">
+        <CanvasRenderer
+          path={path}
+          // yScale={0.999}
+          // yStep={-0.48}
+          // xStep={0.45}
+          // yStepInc={100}
+          // xStepInc={100}
+          yStep={0}
+          xStep={0}
+          yStepInc={0}
+          xStepInc={0}
+          stepWidth={coarseness}
+        />
+        <Timeline path={path} />
+      </div>
+      <div id="right">
         <div>
           <Fiddle
             label={"Iters"}
@@ -124,9 +99,18 @@ const App: React.FC = () => {
             step={0.1}
             min={0.1}
           />
+          <Fiddle
+            label={"Path"}
+            type={"text"}
+            value={pathChunk}
+            updater={setPathChunk}
+          />
+        </div>
+        <div>
+          <PathChunkEditor path={"M0,0 " + pathChunk} />
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

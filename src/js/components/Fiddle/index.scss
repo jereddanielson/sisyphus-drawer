@@ -1,0 +1,14 @@
+.fiddle {
+  white-space: pre-wrap;
+  display: flex;
+  align-items: center;
+
+  .label {
+    width: 100px;
+    text-align: right;
+  }
+
+  input {
+    flex-grow: 1;
+  }
+}

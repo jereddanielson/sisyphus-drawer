@@ -3,4 +3,4 @@ import * as ReactDOM from "react-dom";
 
 import App from "Components/App";
 
-ReactDOM.render(<App />, document.querySelector("#_appRoot"));
+ReactDOM.render(<App />, document.querySelector("#app"));

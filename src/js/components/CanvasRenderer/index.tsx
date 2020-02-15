@@ -3,7 +3,7 @@ import "./index.scss";
 
 const worker = new Worker("w.tsx");
 
-const CanvasRenderer: React.FC<{
+export const CanvasRenderer: React.FC<{
   path: string;
   yStep?: number;
   xStep?: number;
@@ -39,27 +39,24 @@ const CanvasRenderer: React.FC<{
   }, [path, xStep, yStep, xStepInc, yStepInc, stepWidth]);
 
   return (
-    <div id="canvas-renderer">
-      <svg
-        width={800}
-        height={800}
-        viewBox="0 0 200 200"
-        xmlns="http://www.w3.org/2000/svg"
-        fontFamily="monospace"
-      >
-        <text x="0" y="10" fontSize="6">
-          Render: {workerState}
-        </text>
-        <circle fill={"#bcb5a7"} cx={"100"} cy={"100"} r={"100"} />
-        <path
-          stroke={"black"}
-          fill={"transparent"}
-          strokeWidth={0.5}
-          d={pathData}
-        />
-      </svg>
-    </div>
+    <svg
+      id="canvas-renderer"
+      width={800}
+      height={800}
+      viewBox="0 0 200 200"
+      xmlns="http://www.w3.org/2000/svg"
+      fontFamily="monospace"
+    >
+      <text x="0" y="10" fontSize="6">
+        Render: {workerState}
+      </text>
+      <circle fill={"#bcb5a7"} cx={"100"} cy={"100"} r={"100"} />
+      <path
+        stroke={"black"}
+        fill={"transparent"}
+        strokeWidth={0.5}
+        d={pathData}
+      />
+    </svg>
   );
 };
-
-export default CanvasRenderer;
