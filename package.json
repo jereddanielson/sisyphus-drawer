@@ -23,6 +23,7 @@
   ],
   "dependencies": {
     "@material-ui/core": "^4.9.1",
+    "Utils": "^1.0.39",
     "express": "^4.17.1",
     "react": "^16.10.2",
     "react-dom": "^16.10.2",
@@ -54,6 +55,7 @@
     "typescript": "^3.6.3"
   },
   "alias": {
-    "Components": "./src/js/components"
+    "Components": "./src/js/components",
+    "Utils": "./src/js/utils"
   }
 }

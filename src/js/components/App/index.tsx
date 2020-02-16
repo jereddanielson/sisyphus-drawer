@@ -1,9 +1,11 @@
-import * as React from "react";
-import "./index.scss";
 import { CanvasRenderer } from "Components/CanvasRenderer";
-import { Timeline } from "Components/Timeline";
 import { Fiddle } from "Components/Fiddle";
 import { PathChunkEditor } from "Components/PathChunkEditor";
+import { Timeline } from "Components/Timeline";
+import * as React from "react";
+import "./index.scss";
+
+import { P, M, m, C, c, A, a, L, l } from "Utils";
 
 const Block: React.FC<{ block: S.Block }> = ({ block }) => {
   const pathRef = React.useRef<SVGPathElement>(null);
@@ -27,12 +29,18 @@ const Block: React.FC<{ block: S.Block }> = ({ block }) => {
   );
 };
 
+const test: P[] = [
+  m(0, 0),
+  c(2, 0, 4, 4, 4, 8),
+  a(1, 1, 0, 1, 1, -1, -1),
+  c(3, -1, 2, -5, -0.5, -7)
+];
+
 const App: React.FC = () => {
   const [iters, setIters] = React.useState(1);
   const [coarseness, setCoarseness] = React.useState(1);
-  const [pathChunk, setPathChunk] = React.useState(
-    "c 2,0 4,4 4,8 a 1,1 0,1,1 -1,-1 c 3,-1 2,-5 -0.5,-7"
-  );
+
+  const [pathData, setPathData] = React.useState<P[]>(test);
 
   let path = "";
 
@@ -58,10 +66,14 @@ const App: React.FC = () => {
   // }
 
   //
-  path = "M0,0 ";
-  for (let i = iters; i > 0; i--) {
-    path += pathChunk;
-  }
+  // path = "M0,0 ";
+  // for (let i = iters; i > 0; i--) {
+  //   path += pathChunk;
+  // }
+
+  pathData.forEach(ea => {
+    path += ea.getPath();
+  });
 
   return (
     <>
@@ -99,15 +111,24 @@ const App: React.FC = () => {
             step={0.1}
             min={0.1}
           />
-          <Fiddle
+          {/* <Fiddle
             label={"Path"}
             type={"text"}
             value={pathChunk}
             updater={setPathChunk}
-          />
+          /> */}
         </div>
         <div>
-          <PathChunkEditor path={"M0,0 " + pathChunk} />
+          <PathChunkEditor
+            pathData={pathData}
+            updatePathData={(index, path) => {
+              setPathData(oldPathData => {
+                const c = [...oldPathData];
+                c[index] = path;
+                return c;
+              });
+            }}
+          />
         </div>
       </div>
     </>

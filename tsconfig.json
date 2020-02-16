@@ -7,14 +7,10 @@
     "lib": ["esnext", "dom"],
     "baseUrl": ".",
     "paths": {
-      "Components/*": ["./src/js/components/*"]
+      "Components/*": ["./src/js/components/*"],
+      "Utils": ["./src/js/utils"]
     }
   },
-  "exclude": [
-    "node_modules",
-    "**/node_modules/*"
-  ],
-  "include": [
-    "src/**/*"
-  ]
+  "exclude": ["node_modules", "**/node_modules/*"],
+  "include": ["src/**/*"]
 }
