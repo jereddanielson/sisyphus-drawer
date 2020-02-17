@@ -5,7 +5,7 @@ import { Timeline } from "Components/Timeline";
 import * as React from "react";
 import "./index.scss";
 
-import { P, M, m, C, c, A, a, L, l } from "Utils";
+import { P, M, m, C, c, A, a, L, l, AnyCurve } from "Utils";
 
 const Block: React.FC<{ block: S.Block }> = ({ block }) => {
   const pathRef = React.useRef<SVGPathElement>(null);
@@ -29,7 +29,7 @@ const Block: React.FC<{ block: S.Block }> = ({ block }) => {
   );
 };
 
-const test: P[] = [
+const test: AnyCurve[] = [
   m(0, 0),
   c(2, 0, 4, 4, 4, 8),
   a(1, 1, 0, 1, 1, -1, -1),
@@ -40,7 +40,7 @@ const App: React.FC = () => {
   const [iters, setIters] = React.useState(1);
   const [coarseness, setCoarseness] = React.useState(1);
 
-  const [pathData, setPathData] = React.useState<P[]>(test);
+  const [pathData, setPathData] = React.useState<AnyCurve[]>(test);
 
   let path = "";
 

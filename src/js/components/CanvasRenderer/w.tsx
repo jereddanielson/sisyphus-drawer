@@ -47,9 +47,9 @@ self.onmessage = ({ data }) => {
 
   let yInc = 0;
   let xInc = 0;
-  const progress25 = false;
-  const progress50 = false;
-  const progress75 = false;
+  let progress25 = false;
+  let progress50 = false;
+  let progress75 = false;
   for (let i = stepWidth; i < length; i += stepWidth) {
     const ptOrtho = svg.getPointAtLength(i);
     const pt = polarize(

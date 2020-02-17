@@ -171,3 +171,13 @@ export const a = (
   );
   return { ...ret, cmd: "a" };
 };
+
+export type AnyCurve =
+  | MoveRel
+  | MoveAbs
+  | CurveRel
+  | CurveAbs
+  | LineRel
+  | LineAbs
+  | ArcRel
+  | ArcAbs;

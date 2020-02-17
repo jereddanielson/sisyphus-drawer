@@ -1,11 +1,11 @@
 import * as React from "react";
 
 import "./index.scss";
-import { P, CurveRel } from "Utils";
+import { P, CurveRel, AnyCurve } from "Utils";
 
 type Props = {
-  pathData: P[];
-  updatePathData: (index: number, path: P) => void;
+  pathData: AnyCurve[];
+  updatePathData: (index: number, path: AnyCurve) => void;
 };
 
 export const PathChunkEditor: React.FC<Props> = ({
@@ -151,7 +151,7 @@ export const PathChunkEditor: React.FC<Props> = ({
                         onMouseDown={e => {
                           e.stopPropagation();
                           onControlHandleMouseDown(e, (dx, dy) => {
-                            const og = pathData[i];
+                            const og = pathData[i] as CurveRel;
                             updatePathData(i, {
                               ...og,
                               controlX2: og.controlX2 + dx / 20,
