@@ -12,43 +12,60 @@ type Props = {
   stepWidth?: number;
 };
 
-export const CanvasRenderer: React.FC<Props> = ({
-  path = "",
-  yStep = 0,
-  xStep = 0,
-  yStepInc = Infinity,
-  xStepInc = Infinity,
-  stepWidth = 5
-}) => {
+export const CanvasRenderer: React.FC<Props> = props => {
+  const {
+    path = "",
+    yStep = 0,
+    xStep = 0,
+    yStepInc = Infinity,
+    xStepInc = Infinity,
+    stepWidth = 5
+  } = props;
   const [pathData, setPathData] = React.useState<string>("");
   const [workerState, setWorkerState] = React.useState<string>("Done");
+  const [renderQueue, setRenderQueue] = React.useState<
+    Array<{ task: Props; currentStepWidth: number }>
+  >([]);
 
+  // Listen for changes to props and generate render queue
   React.useEffect(() => {
-    if (workerState === "Done") {
+    setRenderQueue([
+      { task: { ...props }, currentStepWidth: stepWidth },
+      { task: { ...props }, currentStepWidth: stepWidth * 2 },
+      { task: { ...props }, currentStepWidth: stepWidth * 4 }
+    ]);
+  }, [props, stepWidth]);
+
+  // Render function
+  const doRender = React.useCallback(
+    (task: Props, currentStepWidth: number) => {
       setWorkerState("0%");
 
-      const doRender = (currentStepWidth: number) => {
-        worker.onmessage = ({ data }) => {
-          setWorkerState(data.status);
-          setPathData(data.path);
-          if (currentStepWidth > stepWidth) {
-            doRender(currentStepWidth / 2);
-          }
-        };
-
-        worker.postMessage({
-          pathData: path,
-          xStep,
-          yStep,
-          xStepInc,
-          yStepInc,
-          stepWidth: Math.max(currentStepWidth, 0.1)
-        });
+      worker.onmessage = ({ data }) => {
+        setWorkerState(data.status);
+        setPathData(data.path);
       };
 
-      doRender(stepWidth * 4);
+      worker.postMessage({
+        ...task,
+        pathData: task.path,
+        stepWidth: Math.max(currentStepWidth, 0.1)
+      });
+    },
+    []
+  );
+
+  // When worker is ready and there are items to render, do so
+  React.useEffect(() => {
+    if (workerState === "Done" && renderQueue.length > 0) {
+      setRenderQueue(oldRenderQueue => {
+        const newRenderQueue = [...oldRenderQueue];
+        const { task, currentStepWidth } = newRenderQueue.pop();
+        doRender(task, currentStepWidth);
+        return newRenderQueue;
+      });
     }
-  }, [path, xStep, yStep, xStepInc, yStepInc, stepWidth]);
+  }, [workerState, renderQueue, doRender]);
 
   return (
     <svg
