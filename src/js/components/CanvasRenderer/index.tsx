@@ -3,14 +3,16 @@ import "./index.scss";
 
 const worker = new Worker("w.tsx");
 
-export const CanvasRenderer: React.FC<{
+type Props = {
   path: string;
   yStep?: number;
   xStep?: number;
   yStepInc?: number;
   xStepInc?: number;
   stepWidth?: number;
-}> = ({
+};
+
+export const CanvasRenderer: React.FC<Props> = ({
   path = "",
   yStep = 0,
   xStep = 0,
@@ -22,20 +24,30 @@ export const CanvasRenderer: React.FC<{
   const [workerState, setWorkerState] = React.useState<string>("Done");
 
   React.useEffect(() => {
-    worker.onmessage = ({ data }) => {
-      setWorkerState(data.status);
-      data.path && setPathData(data.path);
-    };
+    if (workerState === "Done") {
+      setWorkerState("0%");
 
-    worker.postMessage({
-      pathData: path,
-      xStep,
-      yStep,
-      xStepInc,
-      yStepInc,
-      stepWidth: Math.max(stepWidth, 0.1)
-    });
-    setWorkerState("0%");
+      const doRender = (currentStepWidth: number) => {
+        worker.onmessage = ({ data }) => {
+          setWorkerState(data.status);
+          setPathData(data.path);
+          if (currentStepWidth > stepWidth) {
+            doRender(currentStepWidth / 2);
+          }
+        };
+
+        worker.postMessage({
+          pathData: path,
+          xStep,
+          yStep,
+          xStepInc,
+          yStepInc,
+          stepWidth: Math.max(currentStepWidth, 0.1)
+        });
+      };
+
+      doRender(stepWidth * 4);
+    }
   }, [path, xStep, yStep, xStepInc, yStepInc, stepWidth]);
 
   return (

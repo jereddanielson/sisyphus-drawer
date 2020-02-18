@@ -2,7 +2,7 @@ export interface P {
   cmd: "M" | "m" | "L" | "l" | "C" | "c" | "A" | "a";
   endX: number;
   endY: number;
-  getPath: () => string;
+  getPath: (xScale?: number, yScale?: number) => string;
 }
 
 export interface MoveAbs extends P {
@@ -14,8 +14,8 @@ export const M = (endX: number, endY: number): MoveAbs => {
     cmd: "M",
     endX,
     endY,
-    getPath: function() {
-      return `${this.cmd}${this.endX},${this.endY}`;
+    getPath: function(xScale = 1, yScale = 1) {
+      return `${this.cmd}${this.endX * xScale},${this.endY * yScale}`;
     }
   };
 };
@@ -29,8 +29,8 @@ export const m = (endX: number, endY: number): MoveRel => {
     cmd: "m",
     endX,
     endY,
-    getPath: function() {
-      return `${this.cmd}${this.endX},${this.endY}`;
+    getPath: function(xScale = 1, yScale = 1) {
+      return `${this.cmd}${this.endX * xScale},${this.endY * yScale}`;
     }
   };
 };
@@ -44,8 +44,8 @@ export const L = (endX: number, endY: number): LineAbs => {
     cmd: "L",
     endX,
     endY,
-    getPath: function() {
-      return `${this.cmd}${this.endX},${this.endY}`;
+    getPath: function(xScale = 1, yScale = 1) {
+      return `${this.cmd}${this.endX * xScale},${this.endY * yScale}`;
     }
   };
 };
@@ -83,8 +83,10 @@ export const C = (
     controlY2,
     endX,
     endY,
-    getPath: function() {
-      return `${this.cmd}${this.controlX1},${this.controlY1} ${this.controlX2},${this.controlY2} ${this.endX},${this.endY}`;
+    getPath: function(xScale = 1, yScale = 1) {
+      return `${this.cmd}${this.controlX1 * xScale},${this.controlY1 *
+        yScale} ${this.controlX2 * xScale},${this.controlY2 * yScale} ${this
+        .endX * xScale},${this.endY * yScale}`;
     }
   };
 };
@@ -136,8 +138,11 @@ export const A = (
     flagSweep,
     endX,
     endY,
-    getPath: function() {
-      return `${this.cmd}${this.radiusX},${this.radiusY} ${this.rotationAxisX} ${this.flagLargeArc} ${this.flagSweep} ${this.endX},${this.endY}`;
+    getPath: function(xScale = 1, yScale = 1) {
+      return `${this.cmd}${this.radiusX},${this.radiusY} ${
+        this.rotationAxisX
+      } ${this.flagLargeArc} ${this.flagSweep} ${this.endX * xScale},${this
+        .endY * yScale}`;
     }
   };
 };
@@ -181,3 +186,7 @@ export type AnyCurve =
   | LineAbs
   | ArcRel
   | ArcAbs;
+
+export type RelCurve = MoveRel | CurveRel | LineRel | ArcRel;
+
+export type AbsCurve = MoveAbs | CurveAbs | LineAbs | ArcAbs;

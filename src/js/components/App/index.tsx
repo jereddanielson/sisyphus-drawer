@@ -29,8 +29,12 @@ const Block: React.FC<{ block: S.Block }> = ({ block }) => {
   );
 };
 
+interface Block {
+  paths: AnyCurve[];
+  iters: number;
+}
+
 const test: AnyCurve[] = [
-  m(0, 0),
   c(2, 0, 4, 4, 4, 8),
   a(1, 1, 0, 1, 1, -1, -1),
   c(3, -1, 2, -5, -0.5, -7)
@@ -39,10 +43,11 @@ const test: AnyCurve[] = [
 const App: React.FC = () => {
   const [iters, setIters] = React.useState(1);
   const [coarseness, setCoarseness] = React.useState(1);
+  const [xScalePerIter, setXScalePerIter] = React.useState(0);
 
   const [pathData, setPathData] = React.useState<AnyCurve[]>(test);
 
-  let path = "";
+  let path = "m0,0";
 
   // X U
   // path = "m0,0 l";
@@ -71,9 +76,11 @@ const App: React.FC = () => {
   //   path += pathChunk;
   // }
 
-  pathData.forEach(ea => {
-    path += ea.getPath();
-  });
+  for (let i = 0; i < iters; i++) {
+    pathData.forEach(ea => {
+      path += ea.getPath(1 + xScalePerIter);
+    });
+  }
 
   return (
     <>
@@ -111,6 +118,14 @@ const App: React.FC = () => {
             step={0.1}
             min={0.1}
           />
+          <Fiddle
+            label={"X Scale ++"}
+            type={"number"}
+            value={xScalePerIter}
+            updater={setXScalePerIter}
+            step={0.01}
+            min={0.01}
+          />
           {/* <Fiddle
             label={"Path"}
             type={"text"}
@@ -126,6 +141,18 @@ const App: React.FC = () => {
                 const c = [...oldPathData];
                 c[index] = path;
                 return c;
+              });
+            }}
+            deletePath={index => {
+              setPathData(oldPathData => {
+                return oldPathData.filter((ea, i) => {
+                  return i < index;
+                });
+              });
+            }}
+            addPath={newPath => {
+              setPathData(oldPathData => {
+                return [...oldPathData, newPath];
               });
             }}
           />

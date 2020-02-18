@@ -11,23 +11,29 @@ self.onmessage = ({ data }) => {
     yStepInc,
     stepWidth,
     canvasWidth = 100,
-    xCompression = 200
+    xCompression = 200,
+    xFactor = 0.5
   } = data;
+  if (!pathData) {
+    self.postMessage({ status: "Done", path: "" });
+    return;
+  }
+
   const svg = new svgPathProperties(pathData);
   const PI_2 = Math.PI * 2;
 
-  const polarize = (pt: S.Point2D, yStep = 0, xStep = 0) => {
+  const polarize = (pt: S.Point2D, yStep = 0, xStep = 0, xFactor = 1) => {
     // const expansionPressure = rangeMap(pt.y, 100, 0, 0, xStep / 2);
     const expansionPressure = 0;
 
     return {
       x:
         (canvasWidth - pt.y + yStep + expansionPressure) *
-          Math.cos(((pt.x + xStep) / xCompression) * PI_2) +
+          Math.cos(((pt.x + xStep) / xCompression) * PI_2 * xFactor) +
         100,
       y:
         (canvasWidth - pt.y + yStep + expansionPressure) *
-          Math.sin(((pt.x + xStep) / xCompression) * PI_2) +
+          Math.sin(((pt.x + xStep) / xCompression) * PI_2 * xFactor) +
         100
     };
   };
@@ -47,9 +53,9 @@ self.onmessage = ({ data }) => {
 
   let yInc = 0;
   let xInc = 0;
-  let progress25 = false;
-  let progress50 = false;
-  let progress75 = false;
+  // let progress25 = false;
+  // let progress50 = false;
+  // let progress75 = false;
   for (let i = stepWidth; i < length; i += stepWidth) {
     const ptOrtho = svg.getPointAtLength(i);
     const pt = polarize(
@@ -58,7 +64,8 @@ self.onmessage = ({ data }) => {
         y: ptOrtho.y
       },
       yStepTotal,
-      xStepTotal
+      xStepTotal,
+      xFactor
     );
     pathUpdate += ` ${pt.x},${pt.y}`;
     yInc += stepWidth;
@@ -72,16 +79,16 @@ self.onmessage = ({ data }) => {
       xStepTotal += xStep;
     }
 
-    if (!progress25 && i >= length * 0.25) {
-      progress25 = true;
-      self.postMessage({ status: "25%", path: pathUpdate });
-    } else if (!progress50 && i >= length * 0.5) {
-      progress50 = true;
-      self.postMessage({ status: "50%", path: pathUpdate });
-    } else if (!progress75 && i >= length * 0.75) {
-      progress75 = true;
-      self.postMessage({ status: "75%", path: pathUpdate });
-    }
+    // if (!progress25 && i >= length * 0.25) {
+    //   progress25 = true;
+    //   self.postMessage({ status: "25%", path: pathUpdate });
+    // } else if (!progress50 && i >= length * 0.5) {
+    //   progress50 = true;
+    //   self.postMessage({ status: "50%", path: pathUpdate });
+    // } else if (!progress75 && i >= length * 0.75) {
+    //   progress75 = true;
+    //   self.postMessage({ status: "75%", path: pathUpdate });
+    // }
   }
   const ptOrtho = svg.getPointAtLength(length);
   const lastPoint = polarize(
@@ -90,7 +97,8 @@ self.onmessage = ({ data }) => {
       y: ptOrtho.y
     },
     yStepTotal,
-    xStepTotal
+    xStepTotal,
+    xFactor
   );
   pathUpdate += ` ${lastPoint.x},${lastPoint.y}`;
   self.postMessage({ status: "Done", path: pathUpdate });
