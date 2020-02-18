@@ -39,7 +39,7 @@ export const CanvasRenderer: React.FC<Props> = props => {
   // Render function
   const doRender = React.useCallback(
     (task: Props, currentStepWidth: number) => {
-      setWorkerState("0%");
+      setWorkerState("Working");
 
       worker.onmessage = ({ data }) => {
         setWorkerState(data.status);
@@ -76,7 +76,7 @@ export const CanvasRenderer: React.FC<Props> = props => {
       xmlns="http://www.w3.org/2000/svg"
       fontFamily="monospace"
     >
-      <text x="0" y="10" fontSize="6">
+      <text x="0" y="10" fontSize="5">
         Render: {workerState}
       </text>
       <circle fill={"#bcb5a7"} cx={"100"} cy={"100"} r={"100"} />

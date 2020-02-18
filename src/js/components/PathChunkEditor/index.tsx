@@ -3,7 +3,7 @@ import * as React from "react";
 import "./index.scss";
 import { P, CurveRel, AnyCurve, l } from "Utils";
 
-const controlMovementScale = 0.05;
+const controlMovementScale = 0.01;
 
 type Props = {
   pathData: AnyCurve[];
@@ -158,12 +158,12 @@ export const PathChunkEditor: React.FC<Props> = ({
             })}
             {selectedIndex !== null && (
               <g>
-                <circle
+                {/* <circle
                   cx={selectedCurve.startX}
                   cy={selectedCurve.startY}
                   r={0.5}
-                  fill={"salmon"}
-                />
+                  fill={"red"}
+                /> */}
                 <circle
                   onMouseDown={e => {
                     e.stopPropagation();
@@ -183,7 +183,21 @@ export const PathChunkEditor: React.FC<Props> = ({
                 />
                 {selectedCurve.cmd === "c" && (
                   <g>
-                    <circle
+                    <path
+                      className="svg-control-line"
+                      strokeWidth={0.25}
+                      stroke={"green"}
+                      fill={"transparent"}
+                      d={`M${selectedCurve.startX},${selectedCurve.startY} L${selectedCurve.controlX1},${selectedCurve.controlY1}`}
+                    ></path>
+                    <path
+                      className="svg-control-line"
+                      strokeWidth={0.25}
+                      stroke={"green"}
+                      fill={"transparent"}
+                      d={`M${selectedCurve.endX},${selectedCurve.endY} L${selectedCurve.controlX2},${selectedCurve.controlY2}`}
+                    ></path>
+                    <rect
                       onMouseDown={e => {
                         e.stopPropagation();
                         onControlHandleMouseDown(e, (dx, dy) => {
@@ -195,12 +209,13 @@ export const PathChunkEditor: React.FC<Props> = ({
                           });
                         });
                       }}
-                      cx={selectedCurve.controlX1}
-                      cy={selectedCurve.controlY1}
-                      r={0.5}
+                      x={selectedCurve.controlX1 - 0.5}
+                      y={selectedCurve.controlY1 - 0.5}
+                      width={1}
+                      height={1}
                       fill={"salmon"}
                     />
-                    <circle
+                    <rect
                       onMouseDown={e => {
                         e.stopPropagation();
                         onControlHandleMouseDown(e, (dx, dy) => {
@@ -212,9 +227,10 @@ export const PathChunkEditor: React.FC<Props> = ({
                           });
                         });
                       }}
-                      cx={selectedCurve.controlX2}
-                      cy={selectedCurve.controlY2}
-                      r={0.5}
+                      x={selectedCurve.controlX2 - 0.5}
+                      y={selectedCurve.controlY2 - 0.5}
+                      width={1}
+                      height={1}
                       fill={"salmon"}
                     />
                   </g>
