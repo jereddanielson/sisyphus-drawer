@@ -1,16 +1,12 @@
 {
-	"folders": [
-		{
-			"path": "."
-		}
-	],
-	"settings": {
-		"eslint.validate": [
-			{ "language": "javascript", "autoFix": true},
-			{ "language": "javascriptreact", "autoFix": true},
-			{ "language": "typescript", "autoFix": true },
-			{ "language": "typescriptreact", "autoFix": true }
-		],
-		"eslint.autoFixOnSave": true
-	}
+  "folders": [
+    {
+      "path": "."
+    }
+  ],
+  "settings": {
+    "editor.codeActionsOnSave": {
+      "source.fixAll.eslint": true
+    }
+  }
 }
