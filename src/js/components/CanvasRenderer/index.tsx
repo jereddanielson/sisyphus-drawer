@@ -13,14 +13,7 @@ type Props = {
 };
 
 export const CanvasRenderer: React.FC<Props> = props => {
-  const {
-    path = "",
-    yStep = 0,
-    xStep = 0,
-    yStepInc = Infinity,
-    xStepInc = Infinity,
-    stepWidth = 5
-  } = props;
+  const { stepWidth = 5 } = props;
   const [pathData, setPathData] = React.useState<string>("");
   const [workerState, setWorkerState] = React.useState<string>("Done");
   const [renderQueue, setRenderQueue] = React.useState<

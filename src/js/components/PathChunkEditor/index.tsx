@@ -3,6 +3,9 @@ import * as React from "react";
 import "./index.scss";
 import { P, CurveRel, AnyCurve, l } from "Utils";
 
+const VIEWSCALE_MIN = 0.1;
+const VIEWSCALE_MAX = 10;
+
 type Props = {
   pathData: AnyCurve[];
   updatePathData: (index: number, path: AnyCurve) => void;
@@ -19,7 +22,7 @@ export const PathChunkEditor: React.FC<Props> = ({
   const [viewBox, setViewBox] = React.useState({ x: 20, y: 20 });
   const [selectedIndex, setSelectedIndex] = React.useState<number>(null);
   const [offset, setOffset] = React.useState({ x: 0, y: 0 });
-  const [moveScale, setMoveScale] = React.useState(0.1);
+  // const [moveScale, setMoveScale] = React.useState(0.1);
   const [viewScale, setViewScale] = React.useState(1);
 
   const pen = { x: 0, y: 0 };
@@ -98,8 +101,10 @@ export const PathChunkEditor: React.FC<Props> = ({
 
   const cpScale = Math.sqrt(1 / Math.max(viewScale, 0.001));
 
+  const moveScale = 0.01;
+
   return (
-    <div>
+    <>
       <div>
         <button
           onClick={() => {
@@ -122,10 +127,10 @@ export const PathChunkEditor: React.FC<Props> = ({
         </button>
         <input
           type="number"
-          value={moveScale}
+          value={viewScale}
           step={0.1}
           onChange={e => {
-            setMoveScale(Number(e.target.value));
+            setViewScale(Number(e.target.value));
           }}
         />
       </div>
@@ -136,7 +141,10 @@ export const PathChunkEditor: React.FC<Props> = ({
         onWheel={e => {
           const dy = e.deltaY;
           setViewScale(oldViewScale => {
-            return oldViewScale + dy / -1000;
+            return Math.min(
+              Math.max(oldViewScale + dy / -1000, VIEWSCALE_MIN),
+              VIEWSCALE_MAX
+            );
           });
         }}
       >
@@ -147,114 +155,115 @@ export const PathChunkEditor: React.FC<Props> = ({
           height={100}
           fill={"rgba(0, 0, 0, .2)"}
         ></rect>
-        <g transform={`scale(${viewScale})`}>
+        <g
+          transform={`scale(${viewScale}) translate(${offset.x} ${offset.y})`}
+          style={{ transformOrigin: "center center" }}
+        >
           <g transform={`translate(${viewBox.x / 2} ${viewBox.y / 2})`}>
-            <g transform={`translate(${offset.x} ${offset.y})`}>
-              {brokenPathData.map((ea, i) => {
-                const isSelected = i === selectedIndex;
-                return (
-                  <g key={i}>
-                    <path
-                      onClick={() => {
-                        if (isSelected) {
-                          setSelectedIndex(null);
-                        } else {
-                          setSelectedIndex(i);
-                        }
-                      }}
-                      d={ea.d}
-                      fill={"transparent"}
-                      stroke={isSelected ? "red" : "black"}
-                      strokeWidth={0.5}
-                    />
-                  </g>
-                );
-              })}
-              {selectedIndex !== null && (
-                <g>
-                  {/* <circle
+            {brokenPathData.map((ea, i) => {
+              const isSelected = i === selectedIndex;
+              return (
+                <g key={i}>
+                  <path
+                    onClick={() => {
+                      if (isSelected) {
+                        setSelectedIndex(null);
+                      } else {
+                        setSelectedIndex(i);
+                      }
+                    }}
+                    d={ea.d}
+                    fill={"transparent"}
+                    stroke={isSelected ? "red" : "black"}
+                    strokeWidth={0.5}
+                  />
+                </g>
+              );
+            })}
+            {selectedIndex !== null && (
+              <g>
+                {/* <circle
                   cx={selectedCurve.startX}
                   cy={selectedCurve.startY}
                   r={0.5}
                   fill={"red"}
                 /> */}
-                  <circle
-                    onMouseDown={e => {
-                      e.stopPropagation();
-                      onControlHandleMouseDown(e, (dx, dy) => {
-                        const og = pathData[selectedIndex];
-                        updatePathData(selectedIndex, {
-                          ...og,
-                          endX: og.endX + dx * moveScale,
-                          endY: og.endY + dy * moveScale
-                        });
+                <circle
+                  onMouseDown={e => {
+                    e.stopPropagation();
+                    onControlHandleMouseDown(e, (dx, dy) => {
+                      const og = pathData[selectedIndex];
+                      updatePathData(selectedIndex, {
+                        ...og,
+                        endX: og.endX + dx * moveScale,
+                        endY: og.endY + dy * moveScale
                       });
-                    }}
-                    cx={selectedCurve.endX}
-                    cy={selectedCurve.endY}
-                    r={0.5 * cpScale}
-                    fill={"salmon"}
-                  />
-                  {selectedCurve.cmd === "c" && (
-                    <g>
-                      <path
-                        className="svg-control-line"
-                        strokeWidth={0.25}
-                        stroke={"green"}
-                        fill={"transparent"}
-                        d={`M${selectedCurve.startX},${selectedCurve.startY} L${selectedCurve.controlX1},${selectedCurve.controlY1}`}
-                      ></path>
-                      <path
-                        className="svg-control-line"
-                        strokeWidth={0.25}
-                        stroke={"green"}
-                        fill={"transparent"}
-                        d={`M${selectedCurve.endX},${selectedCurve.endY} L${selectedCurve.controlX2},${selectedCurve.controlY2}`}
-                      ></path>
-                      <rect
-                        onMouseDown={e => {
-                          e.stopPropagation();
-                          onControlHandleMouseDown(e, (dx, dy) => {
-                            const og = pathData[selectedIndex] as CurveRel;
-                            updatePathData(selectedIndex, {
-                              ...og,
-                              controlX1: og.controlX1 + dx * moveScale,
-                              controlY1: og.controlY1 + dy * moveScale
-                            });
+                    });
+                  }}
+                  cx={selectedCurve.endX}
+                  cy={selectedCurve.endY}
+                  r={0.5 * cpScale}
+                  fill={"salmon"}
+                />
+                {selectedCurve.cmd === "c" && (
+                  <g>
+                    <path
+                      className="svg-control-line"
+                      strokeWidth={0.25}
+                      stroke={"green"}
+                      fill={"transparent"}
+                      d={`M${selectedCurve.startX},${selectedCurve.startY} L${selectedCurve.controlX1},${selectedCurve.controlY1}`}
+                    ></path>
+                    <path
+                      className="svg-control-line"
+                      strokeWidth={0.25}
+                      stroke={"green"}
+                      fill={"transparent"}
+                      d={`M${selectedCurve.endX},${selectedCurve.endY} L${selectedCurve.controlX2},${selectedCurve.controlY2}`}
+                    ></path>
+                    <rect
+                      onMouseDown={e => {
+                        e.stopPropagation();
+                        onControlHandleMouseDown(e, (dx, dy) => {
+                          const og = pathData[selectedIndex] as CurveRel;
+                          updatePathData(selectedIndex, {
+                            ...og,
+                            controlX1: og.controlX1 + dx * moveScale,
+                            controlY1: og.controlY1 + dy * moveScale
                           });
-                        }}
-                        x={selectedCurve.controlX1 - 0.5 * cpScale}
-                        y={selectedCurve.controlY1 - 0.5 * cpScale}
-                        width={1 * cpScale}
-                        height={1 * cpScale}
-                        fill={"salmon"}
-                      />
-                      <rect
-                        onMouseDown={e => {
-                          e.stopPropagation();
-                          onControlHandleMouseDown(e, (dx, dy) => {
-                            const og = pathData[selectedIndex] as CurveRel;
-                            updatePathData(selectedIndex, {
-                              ...og,
-                              controlX2: og.controlX2 + dx * moveScale,
-                              controlY2: og.controlY2 + dy * moveScale
-                            });
+                        });
+                      }}
+                      x={selectedCurve.controlX1 - 0.5 * cpScale}
+                      y={selectedCurve.controlY1 - 0.5 * cpScale}
+                      width={1 * cpScale}
+                      height={1 * cpScale}
+                      fill={"salmon"}
+                    />
+                    <rect
+                      onMouseDown={e => {
+                        e.stopPropagation();
+                        onControlHandleMouseDown(e, (dx, dy) => {
+                          const og = pathData[selectedIndex] as CurveRel;
+                          updatePathData(selectedIndex, {
+                            ...og,
+                            controlX2: og.controlX2 + dx * moveScale,
+                            controlY2: og.controlY2 + dy * moveScale
                           });
-                        }}
-                        x={selectedCurve.controlX2 - 0.5 * cpScale}
-                        y={selectedCurve.controlY2 - 0.5 * cpScale}
-                        width={1 * cpScale}
-                        height={1 * cpScale}
-                        fill={"salmon"}
-                      />
-                    </g>
-                  )}
-                </g>
-              )}
-            </g>
+                        });
+                      }}
+                      x={selectedCurve.controlX2 - 0.5 * cpScale}
+                      y={selectedCurve.controlY2 - 0.5 * cpScale}
+                      width={1 * cpScale}
+                      height={1 * cpScale}
+                      fill={"salmon"}
+                    />
+                  </g>
+                )}
+              </g>
+            )}
           </g>
         </g>
       </svg>
-    </div>
+    </>
   );
 };
